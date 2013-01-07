@@ -1,0 +1,2 @@
+THE FOLLOWING LINK DESCRIBES THE LICENSE
+http://www.apache.org/licenses/LICENSE-2.0
