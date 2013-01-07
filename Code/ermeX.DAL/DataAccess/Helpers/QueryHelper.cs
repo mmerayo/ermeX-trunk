@@ -412,7 +412,7 @@ namespace ermeX.DAL.DataAccess.Helpers
 
 
             var parameters = new[] {row};
-            var result = (TObject) TypesHelper.InvokeFast(methodInfo, null, parameters);
+            var result = (TObject)methodInfo.Invoke(null, parameters);//TODO: INVESTIGATE & FIX why FastInvoke wont work on x86 THROWING "JIT Compiler encountered an internal limitation" 
             return result;
         }
 

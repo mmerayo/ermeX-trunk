@@ -1,4 +1,4 @@
-<NUnitProject>
+﻿<NUnitProject>
   <Settings activeconfig="Release x64" />
   <Config name="Release x64" binpathtype="Auto">
     <assembly path="ermeX.Tests\bin\x64\Release\ermeX.Tests.dll" />
