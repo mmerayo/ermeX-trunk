@@ -16,4 +16,6 @@ _UpgradeReport.*
 *.user
 BuildArtifacts
 *.orig
+TestResult.xml
+*.VisualState.xml
 
