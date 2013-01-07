@@ -53,11 +53,12 @@ namespace ermeX.Tests.Common.Networking
             ushort candidatePort;
             do
             {
-                candidatePort = Network.GetFreePort(bottomRange, topRange);
                 try
                 {
                     using (var mutex = new Mutex(false, LockDbCreationMutexName))
                     {
+                        candidatePort = Network.GetFreePort(bottomRange, topRange);
+
                         mutex.WaitOne(TimeSpan.FromSeconds(10));
                         QueryHelper.ExecuteNonQuery(string.Format("INSERT INTO PortsBooked (PortNumber) VALUES ({0})",
                                                                   candidatePort));
