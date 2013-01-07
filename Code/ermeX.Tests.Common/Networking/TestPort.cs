@@ -50,7 +50,7 @@ namespace ermeX.Tests.Common.Networking
         {
             bool booked = false;
 
-            ushort candidatePort;
+            ushort candidatePort=0;
             do
             {
                 try

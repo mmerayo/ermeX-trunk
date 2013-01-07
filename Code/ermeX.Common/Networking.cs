@@ -23,6 +23,7 @@ namespace ermeX.Common
         {
             IPGlobalProperties ipGlobalProperties = IPGlobalProperties.GetIPGlobalProperties();
             IPEndPoint[] endpoints = ipGlobalProperties.GetActiveTcpListeners();
+
             if (endpoints == null || endpoints.Length == 0) return false;
             return endpoints.Any(t => t.Port == port);
         }
