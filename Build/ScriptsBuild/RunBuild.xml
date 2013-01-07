@@ -5,8 +5,8 @@
 
   <PropertyGroup>
     <MSBuildExtensionsPath>$(MSBuildProjectDirectory)\..\Packages\msBuildTaskExtensions</MSBuildExtensionsPath>
-    <ubiQProjectDir>$(MSBuildProjectDirectory)\..\..\ubiQ\ubiQ</ubiQProjectDir>
-    <MergedBinFolder>$(OutputPath)..\Merged\v$(frameworkVersion)\$(Platform)</MergedBinFolder>
+    <ermeXProjectDir>$(MSBuildProjectDirectory)\..\..\Code\ermeX</ermeXProjectDir>
+    <MergedBinFolder>$(MergedFolder)</MergedBinFolder>
 	<TargetFrameworkVersion>v$(frameworkVersion)</TargetFrameworkVersion>	
    </PropertyGroup>
 
@@ -24,7 +24,7 @@
     <Message Text="MSBuildProjectDirectory: $(MSBuildProjectDirectory)"/>
     <Message Text="OutputPath: $(OutputPath)"/>    
 	<Message Text="TargetFrameworkVersion: $(TargetFrameworkVersion)"/>	
-    <Message Text="ubiQProjectDir: $(ubiQProjectDir)"/>
+    <Message Text="ermeXProjectDir: $(ermeXProjectDir)"/>
     <!--<MSBuild.ExtensionPack.UI.Console TaskAction="ReadLine" UserPrompt="Press [Enter] to continue…"/>-->
   </Target>
 
@@ -58,7 +58,7 @@
 	<CallTarget Targets="CleanLastBuild" />
     <CallTarget Targets="CreateOutputDirectories" />
     
-	<MSBuild Projects="$(MSBuildProjectDirectory)\..\..\ubiQ\ubiQ.sln" />
+	<MSBuild Projects="$(MSBuildProjectDirectory)\..\..\Code\ermeX.sln" />
 	<Message Text="The build version is: $(BuildVersion)"/> 
 	<CallTarget Targets="MergeOutput" />
 	
@@ -73,7 +73,7 @@
   <Target Name="CreatePackageTask" Condition=" $(TaskIdName) == 'Pack' ">
 	<Message Text="CreatePackage:Start" />	
 	<Message Text="The build tag is: $(BuildTag)"/> 
-    <MSBuild.ExtensionPack.Compression.Zip TaskAction="Create" CompressFiles="$(MergedBinFolder)\ubiQ.dll" ZipFileName="$(BuildReportsFolder)\ubiQ_$(BuildTag).zip" RemoveRoot="$(MergedBinFolder)" />
+    <MSBuild.ExtensionPack.Compression.Zip TaskAction="Create" CompressFiles="$(MergedBinFolder)\ermeX.dll" ZipFileName="$(BuildReportsFolder)\ermeX_$(BuildTag).zip" RemoveRoot="$(MergedBinFolder)" />
 	<Message Text="CreatePackage:End" />
   </Target>
 
@@ -95,8 +95,8 @@
 
   <Target Name="SetVersionPrefix">
     <ItemGroup>
-      <VersionFile Include="$(ubiQProjectDir)\..\..\Build\VersionPrefix.txt" />
-      <AssemblyInfoFiles Include="$(ubiQProjectDir)\Properties\ProjectInfo.cs" />
+      <VersionFile Include="$(ermeXProjectDir)\..\..\Build\VersionPrefix.txt" />
+      <AssemblyInfoFiles Include="$(ermeXProjectDir)\Properties\ProjectInfo.cs" />
     </ItemGroup>
 
     <ReadLinesFromFile File="@(VersionFile)">
@@ -131,13 +131,13 @@
 	<Message Text="The build version is name is: $(BuildVersion)"/> 
     <ILMerge.MSBuild.Tasks.ILMerge
 		InputAssemblies="@(Input)"
-		SnkFile="$(ubiQProjectDir)\KeyFile.snk"
+		SnkFile="$(ermeXProjectDir)\KeyFile.snk"
 		TargetAssemblyVersion="$(BuildVersion)"
-		AttributeFile="$(OutputPath)ubiQ.dll"		
+		AttributeFile="$(OutputPath)ermeX.dll"		
 		DebugInfo="true"
-		OutputFile="$(MergedBinFolder)\ubiQ.dll"
+		OutputFile="$(MergedBinFolder)\ermeX.dll"
 		Internalize="true"
-		ExcludeFile="$(ubiQProjectDir)\RemainPublicAfterMerge.txt"		
+		ExcludeFile="$(ermeXProjectDir)\RemainPublicAfterMerge.txt"		
 		Closed="false"
 		/>
 	<Copy SourceFiles="@(NotMergeable)" DestinationFolder="$(MergedBinFolder)"/>
@@ -146,8 +146,8 @@
 
 
   <Target Name="RemoveNonMergeableFiles">
-    <Delete Files="$(OutputPath)ubiQ.Tests.dll" />
-    <Delete Files="$(OutputPath)ubiQ.Tests.pdb" />
+    <Delete Files="$(OutputPath)ermeX.Tests.dll" />
+    <Delete Files="$(OutputPath)ermeX.Tests.pdb" />
     <Delete Files="$(OutputPath)Moq.dll" />
     <MSBuild.ExtensionPack.UI.Console TaskAction="ReadLine" UserPrompt="Press [Enter] to continue…"/>
   </Target>

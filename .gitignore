@@ -14,9 +14,6 @@ _UpgradeReport.*
 *~
 *.swp
 *.user
-TestResult.xml
+BuildArtifacts
 *.orig
-PrecompiledWeb
-core-only
 
-csx
