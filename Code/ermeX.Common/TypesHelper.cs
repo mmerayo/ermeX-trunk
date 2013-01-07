@@ -217,9 +217,15 @@ namespace ermeX.Common
 
         public static object InvokeFast(MethodInfo method, object target,object[] args)
         {
-            var invoker = ILHelper.GetMethodInvoker(method);
-            return invoker(target, args);
-         
+            object result = null;
+            if (Environment.Is64BitProcess)
+            {
+                var invoker = ILHelper.GetMethodInvoker(method);
+                result = invoker(target, args);
+            }
+            else //TODO: THIS IS DUE A LIMITATION in the x86 COMPILER
+                result = method.Invoke(target, args);
+            return result;
         }
 
 

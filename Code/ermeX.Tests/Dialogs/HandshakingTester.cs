@@ -18,6 +18,7 @@ using ermeX.ConfigurationManagement;
 using ermeX.ConfigurationManagement.Settings.Data.DbEngines;
 using ermeX.Entities.Entities;
 using ermeX.Tests.Common.DataAccess;
+using ermeX.Tests.Common.Networking;
 using ermeX.Tests.Common.SettingsProviders;
 using ermeX.Tests.Services.Builtin.SuperSockets;
 using ermeX.Tests.Services.Mock;
@@ -55,20 +56,26 @@ namespace ermeX.Tests.Dialogs
         {
             List<DummySocketServerResult> dummyResult;
             int remotePort;
-            Guid operationIdentifier;
-            AutoResetEvent eventDone ;
-
-            using (
-                var server1 = CreateThirdServerComponentForRequestJoinTo(dbEngine,RemoteComponentId, out dummyResult, out remotePort, out eventDone))
+            using (var localPort = new TestPort(2000))
             {
-                var serviceLayerSettingsSource = TestSettingsProvider.GetServiceLayerSettingsSource(
-                    LocalComponentId, dbEngine, SchemasToApply)
-                    .RequestJoinTo(Networking.GetLocalhostIp(), remotePort, RemoteComponentId);
-                WorldGate.ConfigureAndStart(serviceLayerSettingsSource);
+                AutoResetEvent eventDone;
 
-                eventDone.WaitOne(_timeSpanWait);
+                using (
+                    var server1 = CreateThirdServerComponentForRequestJoinTo(dbEngine, RemoteComponentId,
+                                                                             out dummyResult, out remotePort,
+                                                                             out eventDone))
+                {
+                    var serviceLayerSettingsSource = TestSettingsProvider.GetServiceLayerSettingsSource(
+                        LocalComponentId, dbEngine, SchemasToApply)
+                        .RequestJoinTo(Networking.GetLocalhostIp(), remotePort, RemoteComponentId).ListeningToPort(localPort);
+                    WorldGate.ConfigureAndStart(serviceLayerSettingsSource);
 
-                AssertReceivedJoinRequestMessage(serviceLayerSettingsSource, ServiceOperationAttribute.GetOperationIdentifier(typeof(IHandshakeService),"RequestJoinNetwork"), server1);
+                    eventDone.WaitOne(_timeSpanWait);
+
+                    AssertReceivedJoinRequestMessage(serviceLayerSettingsSource,
+                                                     ServiceOperationAttribute.GetOperationIdentifier(
+                                                         typeof (IHandshakeService), "RequestJoinNetwork"), server1);
+                }
             }
 
         }
@@ -81,12 +88,13 @@ namespace ermeX.Tests.Dialogs
             List<DummySocketServerResult> dummyResult;
             int remotePort;
             AutoResetEvent eventDone ;
+            var localPort = new TestPort(2000);
             using (
                 var server1 = CreateThirdServerComponentForRequestJoinTo(dbEngine,RemoteComponentId, out dummyResult, out remotePort,out eventDone))
             {
                 var serviceLayerSettingsSource = TestSettingsProvider.GetServiceLayerSettingsSource(
                     LocalComponentId, dbEngine, SchemasToApply)
-                    .RequestJoinTo(Networking.GetLocalhostIp(), remotePort, RemoteComponentId);
+                    .RequestJoinTo(Networking.GetLocalhostIp(), remotePort, RemoteComponentId).ListeningToPort(localPort);
                 WorldGate.ConfigureAndStart(serviceLayerSettingsSource);
 
                 eventDone.WaitOne(_timeSpanWait);
@@ -109,8 +117,9 @@ namespace ermeX.Tests.Dialogs
         public void WhenReceived_JoinRequestMessage_Sends_MyComponentsMessage_To_The_Caller(DbEngineType dbEngine)
         {
             //Arrange
+            var localPort = new TestPort(2000);
             var serviceLayerSettingsSource = TestSettingsProvider.GetServiceLayerSettingsSource(
-                RemoteComponentId, dbEngine, SchemasToApply);
+                RemoteComponentId, dbEngine, SchemasToApply).ListeningToPort(localPort);
             WorldGate.ConfigureAndStart(serviceLayerSettingsSource);
 
             ServiceRequestMessage request;
@@ -144,6 +153,7 @@ namespace ermeX.Tests.Dialogs
             List<DummySocketServerResult> dummyResultFriend;
             int remotePortFriend;
             AutoResetEvent eventDoneFriend;
+            var localPort = new TestPort(2000);
             using (var friendSrv = CreateThirdServerComponentForRequestJoinTo(dbEngine,RemoteComponentId, out dummyResultFriend, out remotePortFriend,
                                                                        out eventDoneFriend))
             {
@@ -186,7 +196,7 @@ namespace ermeX.Tests.Dialogs
 
                     //Join network
                     var layerSettingsSource = TestSettingsProvider.GetServiceLayerSettingsSource(LocalComponentId, dbEngine, SchemasToApply);
-                    serviceLayerSettingsSource = layerSettingsSource.RequestJoinTo(Networking.GetLocalhostIp(), remotePortFriend, RemoteComponentId);
+                    serviceLayerSettingsSource = layerSettingsSource.RequestJoinTo(Networking.GetLocalhostIp(), remotePortFriend, RemoteComponentId).ListeningToPort(localPort);
                     WorldGate.ConfigureAndStart(serviceLayerSettingsSource);
 
                     eventDoneThird.WaitOne(_timeSpanWait);
