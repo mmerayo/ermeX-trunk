@@ -15,9 +15,7 @@ _UpgradeReport.*
 *.user
 TestResult.xml
 *.orig
-packages
 PrecompiledWeb
 core-only
 Release
-Artifacts
 csx
